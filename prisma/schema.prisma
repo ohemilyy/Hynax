@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("MONGODB_URL")
+}
+
+//===================================================================
+// Guild General
+//===================================================================
+model GuildGeneralPanel {
+  id                   String   @id @default(auto()) @map("_id") @db.ObjectId
+  guildID              String   @unique
+  logChannelID         String   @default("")
+  defaultEmbedColorHex String   @default("")
+  successEmbedColorHex String   @default("")
+  errorEmbedColorHex   String   @default("")
+  defaultEmbedColor    Int      @default(0)
+  successEmbedColor    Int      @default(0)
+  errorEmbedColor      Int      @default(0)
+  modRoleIDs           String[] @default([])
+}
+
+//===================================================================
+// Guild Support Ticket
+//===================================================================
+model GuildTicketConfig {
+  id                String @id @default(auto()) @map("_id") @db.ObjectId
+  guildID           String @unique
+  channelNameFormat String @default("ticket-{number}")
+}
+
+model GuildTicketPanel {
+  id             String        @id @default(auto()) @map("_id") @db.ObjectId
+  name           String
+  guildID        String
+  logChannelID   String?
+  categoryID     String?
+  supportRoleIDs String[]      @default([])
+  claimRoleIDs   String[]      @default([])
+  pingRoleID     String?
+  questions      String[]      @default([])
+  emoji          String        @default("✉️")
+  btnLabel       String        @default("Create Ticket")
+  GuildTicket    GuildTicket[]
+}
+
+model GuildTicket {
+  id                    String              @id @default(auto()) @map("_id") @db.ObjectId
+  guildID               String
+  ticketChannelID       String
+  createdMemberID       String
+  createdMemberUsername String              @default("")
+  controlMessageID      String              @default("")
+  claimedMemberID       String?
+  panelID               String              @db.ObjectId
+  status                String              @default("open")
+  panel                 GuildTicketPanel    @relation(fields: [panelID], references: [id], onDelete: Cascade)
+  GuildTicketMember     GuildTicketMember[]
+  createdAt             DateTime            @default(now())
+
+  @@unique([guildID, ticketChannelID])
+}
+
+model GuildTicketMember {
+  id             String      @id @default(auto()) @map("_id") @db.ObjectId
+  ticketID       String      @db.ObjectId
+  memberID       String
+  memberUsername String      @default("")
+  ticket         GuildTicket @relation(fields: [ticketID], references: [id], onDelete: Cascade)
+
+  @@unique([ticketID, memberID])
+}
+
+model GuildTicketBlacklist {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  guildID String
+  userID  String
+
+  @@unique([guildID, userID])
+}
+
+//===================================================================
+//  Self-Role Module
+//===================================================================
+model GuildSelfRolePanel {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  guildID     String
+  giveRoleIDs String[] @default([])
+  buttonLabel String
+  buttonEmoji String
+
+  @@unique([guildID, name])
+}
+
+//===================================================================
+//  Report module
+//===================================================================
+model GuildReportPanel {
+  id            String   @id @default(auto()) @map("_id") @db.ObjectId
+  guildID       String   @unique
+  channelID     String?
+  accessRoleIDs String[] @default([])
+}
+
+model GuildReport {
+  id                     String   @id @default(auto()) @map("_id") @db.ObjectId
+  guildID                String
+  createdMemberID        String
+  createdMemberUsername  String
+  reportedMemberID       String
+  reportedMemberUsername String
+  reason                 String
+  status                 String   @default("open")
+  createdAt              DateTime @default(now())
+}
+
+//===================================================================
+//  Word Blacklist Module 
+//===================================================================
+model GuildWordBlacklistPanel {
+  id                  String @id @default(auto()) @map("_id") @db.ObjectId
+  guildID             String @unique
+  minorTimeoutSeconds Int    @default(0)
+  majorTimeoutSeconds Int    @default(0)
+}
+
+model GuildWordBlacklist {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  guildID String
+  word    String
+  type    String
+
+  @@unique([guildID, word])
+}
+
+//===================================================================
+//  TempBan Module
+//===================================================================
+model GuildTempBan {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  guildID   String
+  userID    String
+  username  String
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+}
+
+//===================================================================
+//  URL/IP Whitelist Module
+//===================================================================
+model GuildUrlIpWhitelistPanel {
+  id             String @id @default(auto()) @map("_id") @db.ObjectId
+  guildID        String @unique
+  timeoutSeconds Int    @default(0)
+}
+
+model GuildUrlIpWhitelist {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  guildID String
+  entry   String
+  type    String
+
+  @@unique([guildID, entry])
+}

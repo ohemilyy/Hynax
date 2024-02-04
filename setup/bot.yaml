@@ -1,0 +1,27 @@
+# Token of your Discord bot from https://discord.com/developers/applications
+TOKEN: ""
+
+# This is the activity type of bot (status) and can be one of the following,
+#   PLAYING   0
+#   STREAMING 1
+#   LISTENING 2
+#   WATCHING  3
+#   COMPETING 5
+ACTIVITY TYPE: 3
+
+# This is the name of the activity that can be seen right next to activity type.
+# You can use any text you want here.
+ACTIVITY NAME: "systems"
+
+# Online, offline and other states bot can have. This can be one of the following,
+#   online
+#   idle
+#   dnd
+STATUS: "online"
+
+# Guild used for slash command testing.
+# This is only for development and you can safely ignore this option.
+TEST GUILD ID: "1066351250410577960"
+
+# If the bot is running in production mode or not. Set to "false" for testing
+PRODUCTION: true
